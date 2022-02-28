@@ -162,6 +162,7 @@ class Wordle_CPU:
             except:
                 word = random.choice(self.available_words)
         else:
+            print(self.available_words)
             word = random.choice(self.available_words)
         
         try:
@@ -179,9 +180,8 @@ class Wordle_CPU:
         
         self.guessed_letters += word
         self.guessed_letters = "".join(set(self.guessed_letters))
-        for i in range(5):
-            self.app.letters[self.app.current_row][i][1].set(word[i])
-        in_word, correct_pos = self.app.check()
+
+        in_word, correct_pos = self.app.check(word)
         for i in range(5):
             if correct_pos[i] != "_" and self.correct_letters[i] == "_":
                 self.correct_letters = '%s%s%s' % (self.correct_letters[:i], word[i], self.correct_letters[i+1:])
@@ -193,4 +193,3 @@ class Wordle_CPU:
                 self.not_in_word += letter
                 
         self.filter3()
-        self.app.root.update_idletasks()
