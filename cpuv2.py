@@ -3,7 +3,7 @@ import re
 class Wordle_CPU:
     def __init__(self, app):
         self.app = app
-        self.available_words = self.app.word_list
+        self.available_words = [line[:-1] for line in open("words.txt", "r")]
         self.correct_letters = "_____"
         self.in_word = ""
         self.not_in_word = ""
@@ -154,15 +154,14 @@ class Wordle_CPU:
             word = "stand"
         elif self.app.current_row == 1:
             word = "oiler"
-        # else:
-        #     word = random.choice(self.available_words)
         elif len(self.available_words) > 5 - self.app.current_row:
             try:
                 word = max(self.filter4("_____", "", self.guessed_letters, self.app.word_list), key=self.get_word_score)
             except:
                 word = random.choice(self.available_words)
         else:
-            print(self.available_words)
+            if len(self.available_words) == 0:
+                self.available_words = [line[:-1] for line in open("words.txt", "r")]
             word = random.choice(self.available_words)
         
         try:

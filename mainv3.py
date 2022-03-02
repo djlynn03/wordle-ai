@@ -10,104 +10,41 @@ game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
 class App:
     def __init__(self):
         self.word_list = [line[:-1] for line in open("words.txt", "r")]
-        # self.root = Tk()
-        # self.root.geometry('500x500')
-        # self.frm = ttk.Frame(self.root, padding=10)
-        # self.root.config(bg="#f0f0f0")
-        # self.frm.grid(sticky="nsew")
-        
-        # self.correct_style = ttk.Style(self.root)
-        # self.correct_style.configure("TEntry", background="green")
-        
-        # self.focused_item = None
         self.current_row = 0
-        # self.create_table()
         self.current_word = self.generate_word()
         self.state = "playing" # playing, win, loss
-        # self.current_word = "fails"
-        
-        # self.check_btn = ttk.Button(self.frm, text="Check Word", command=lambda : self.check())
-        # self.check_btn.grid(column=2, row=6)
+
         
         self.cpu = Wordle_CPU(self)
 
-        # self.auto_btn = ttk.Button(self.frm, text="Run CPU", command=lambda: self.cpu.make_guess())
-        # self.auto_btn.grid(column=4, row=6)
-        
-        # self.reset_btn = ttk.Button(self.frm, text="Reset", command=lambda: self.reset())
-        # self.reset_btn.grid(column=5, row=6)
-        
         while True:
-            print(game_data)
-            self.cpu.make_guess()
-            try:
+            if self.state == "playing":
                 self.cpu.make_guess()
-            except:
+            else:
                 self.reset()
+            # print(game_data)
+            # # self.cpu.make_guess()
+            # try:
+            #     self.cpu.make_guess()
+            # except:
+            #     self.reset()
                 
             # time.sleep(0.5)
         
-        # self.root.mainloop()
 
     
     def reset(self):
-        # self.root.destroy()
+        pct = (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"]) / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"])
+        print(str(game_data) + " " + str(pct))
         del self.cpu
-        del self
-        app = App()
+        self.cpu = Wordle_CPU(self)
+        self.word_list = [line[:-1] for line in open("words.txt", "r")]
+        self.current_row = 0
+        self.current_word = self.generate_word()
+        self.state = "playing" # playing, win, loss
     
-    # def create_table(self):
-    #     self.letters = []
-    #     row = []
-        
-    #     for i in range(6):
-    #         for j in range(5):
-    #             txt = StringVar()
-    #             txt.trace("w", lambda name, index, mode, sv=txt, r=i, c=j: self.next_entry(sv, r, c))
-    #             item = Entry(self.frm, width=5, font=('Arial', 20), textvariable=txt, justify=CENTER)
-    #             item.bind("<BackSpace>", lambda event, r=i, c=j: self.last_entry(r, c))
-    #             item.bind("<FocusIn>", lambda event, r=i, c=j: self.set_focus_color(r, c, "in"))
-    #             item.bind("<FocusOut>", lambda event, r=i, c=j: self.set_focus_color(r, c, "out"))
-
-    #             if j == 4:
-    #                 item.bind("<Return>", lambda event, r=i, c=j: self.check())
-    #             item.grid(column=j, row=i)
-    #             row.append((item, txt))
-                
-    #         self.letters.append(row)
-    #         row = []
-    
-    # def next_entry(self, e, row, col):
-    #     if len(e.get()) > 0:
-    #         e.set(e.get()[-1])
-            
-    #         if col < 4:
-    #             self.set_focus(self.letters[row][col + 1][0])
-                
-    #         else:
-    #             self.letters[row][col][0].focus_set()
-                
-    #     if not e.get().isalpha():
-    #         e.set("")        
-    
-    # def last_entry(self, row, col):
-    #     if col == 0:
-    #         return
-    #     if self.letters[row][col][1].get() == "":
-    #         self.letters[row][col-1][1].set("")
-            
-    #     self.letters[row][col][1].set("")
-    #     self.letters[row][col-1][0].focus_set()
-    
-    # def set_focus_color(self, row, col, type):
-    #     if type == "in":
-    #         self.letters[row][col][0].config(bg="#f0f0f0")
-    #     else:
-    #         self.letters[row][col][0].config(bg="#ffffff")
     
     def check(self, word):
-        print(word)
-
         if len(word) == 5:
             in_word = "_____"
             correct_pos = "_____"
@@ -133,25 +70,16 @@ class App:
             self.current_row += 1
             
             return in_word, correct_pos
-        return
+        return "_____", "_____"
     
     def end_game(self, state):
-        print(str(self.current_row + 1) + " guesses " + state)
+        # print(str(self.current_row + 1) + " guesses " + state)
         if state == "win":
             game_data[str(self.current_row + 1)] += 1
         else:
             game_data["DNF"] += 1
-        # for i in self.letters:
-        #     for j in i:
-        #         j[0].bind("<Key>", lambda event: "break")
-        # if state == "win":
-        #     self.victory_label = ttk.Label(self.frm, text="You won")
-        #     self.victory_label.grid(column=2, row=7)
-        
-          
-    # def set_focus(self, item):
-    #     item.focus_set()
-    #     self.focused_item = item
+        self.state = "end"
+
 
     def generate_word(self):
         return random.choice([line for line in open("words.txt", "r")])
