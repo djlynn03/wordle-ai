@@ -560,7 +560,6 @@ slide
 trunk
 error
 porch
-slave
 exist
 faced
 mines
