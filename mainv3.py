@@ -51,13 +51,11 @@ class App:
             
             for i in range(len(word)):
                 if word[i] == self.current_word[i]:
-                    # self.letters[self.current_row][i][0].configure(background="green")
                     correct_pos = '%s%s%s' % (correct_pos[:i], word[i], correct_pos[i+1:])
                     
             for i in range(len(word)):
                 if word[i] in self.current_word:
                     if (in_word + correct_pos).count(word[i]) < self.current_word.count(word[i]):
-                        # self.letters[self.current_row][i][0].configure(background="yellow")
                         in_word = '%s%s%s' % (in_word[:i], word[i], in_word[i+1:])
 
             if correct_pos.count("_") == 0:
