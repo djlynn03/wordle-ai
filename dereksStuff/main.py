@@ -23,22 +23,22 @@ def run_game():
     steps = 0
     pass
 
-def maxTop(word_list, letter_dictionary):
-    count = 0
-    best_words = []
-    for word in word_list:
-        if count > 1000:
-            break
-        max_value = 0
-        max_word = word_list[0]
-        for word in word_list:
-            if get_word_value(word, letter_dictionary) > max_value:
-                max_value = get_word_value(word, letter_dictionary)
-                max_word = word
-        best_words.append(max_word)
-        count += 1
-    letter_dictionary = get_letter_dictionary(best_words)
-    return max(best_words, key= lambda i=word, j=letter_dictionary: get_word_value(i, j))
+# def maxTop(word_list, letter_dictionary):
+#     count = 0
+#     best_words = []
+#     for word in word_list:
+#         if count > 1000:
+#             break
+#         max_value = 0
+#         max_word = word_list[0]
+#         for word in word_list:
+#             if get_word_value(word, letter_dictionary) > max_value:
+#                 max_value = get_word_value(word, letter_dictionary)
+#                 max_word = word
+#         best_words.append(max_word)
+#         count += 1
+#     letter_dictionary = get_letter_dictionary(best_words)
+#     return max(best_words, key= lambda i=word, j=letter_dictionary: get_word_value(i, j))
 
 def game_data_avg(game_data):
     try:
@@ -46,189 +46,189 @@ def game_data_avg(game_data):
     except:
         return 0
 
-def test_algorithm6(n):
-    game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
-    available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
-    letter_dictionary = get_letter_dictionary(available_words)
-    for i in range(n):
-        available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
-        test_word = random.choice(available_words)
-        available_words = filter_words(available_words, best_pair_first_word, test_word)
-        # print(available_words)
-        available_words = filter_words(available_words, best_pair_second_word, test_word)
-        # print(available_words)
-        steps = 2
-        for int in range(4):
-            if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
-                available_words = filter_words(available_words, random.choice(available_words), test_word)
-                steps += 1
-            else:
-                min = len(available_words)
-                letter_dictionary = get_letter_dictionary(available_words)
-                for j in range(100):
-                    guess = random.choice(available_words)
-                    guess_words_length = len(filter_words(available_words, guess, maxTop(available_words, letter_dictionary)))
-                    if guess_words_length < min:
-                        highestReductionWord = guess
-                        min = guess_words_length
-                available_words = filter_words(available_words, highestReductionWord, test_word)
-                steps += 1
-            if len(available_words) == 1 and available_words[0] == test_word:
-                # print(available_words[0], "steps:", steps)
-                game_data.update({str(steps): game_data[str(steps)] + 1})
-            elif test_word not in available_words:
-                raise RuntimeError("Answer not in list")
-        if len(available_words) != 1 and available_words[0] != test_word:
-            game_data.update({"DNF": game_data["DNF"] + 1})
-        success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-        print("6", game_data, success_rate, game_data_avg(game_data))
+# def test_algorithm6(n):
+#     game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
+#     available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
+#     letter_dictionary = get_letter_dictionary(available_words)
+#     for i in range(n):
+#         available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
+#         test_word = random.choice(available_words)
+#         available_words = filter_words(available_words, best_pair_first_word, test_word)
+#         # print(available_words)
+#         available_words = filter_words(available_words, best_pair_second_word, test_word)
+#         # print(available_words)
+#         steps = 2
+#         for int in range(4):
+#             if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
+#                 available_words = filter_words(available_words, random.choice(available_words), test_word)
+#                 steps += 1
+#             else:
+#                 min = len(available_words)
+#                 letter_dictionary = get_letter_dictionary(available_words)
+#                 for j in range(100):
+#                     guess = random.choice(available_words)
+#                     guess_words_length = len(filter_words(available_words, guess, maxTop(available_words, letter_dictionary)))
+#                     if guess_words_length < min:
+#                         highestReductionWord = guess
+#                         min = guess_words_length
+#                 available_words = filter_words(available_words, highestReductionWord, test_word)
+#                 steps += 1
+#             if len(available_words) == 1 and available_words[0] == test_word:
+#                 # print(available_words[0], "steps:", steps)
+#                 game_data.update({str(steps): game_data[str(steps)] + 1})
+#             elif test_word not in available_words:
+#                 raise RuntimeError("Answer not in list")
+#         if len(available_words) != 1 and available_words[0] != test_word:
+#             game_data.update({"DNF": game_data["DNF"] + 1})
+#         success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+#         print("6", game_data, success_rate, game_data_avg(game_data))
 
-def test_bestFirstPairHighestReductionDynamicDictionary(n):
-    game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
-    letter_dictionary = get_letter_dictionary(available_words)
-    for i in range(n):
-        available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
-        test_word = random.choice(available_words)
-        available_words = filter_words(available_words, best_pair_first_word, test_word)
-        # print(available_words)
-        available_words = filter_words(available_words, best_pair_second_word, test_word)
-        # print(available_words)
-        steps = 2
-        for int in range(4):
-            if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
-                available_words = filter_words(available_words, random.choice(available_words), test_word)
-                steps += 1
-            else:
-                min = len(available_words)
-                letter_dictionary = get_letter_dictionary(available_words)
-                for j in range(100):
-                    guess = random.choice(available_words)
-                    guess_words_length = len(filter_words(available_words, guess, max(available_words, key= lambda i=guess, j=letter_dictionary: get_word_value(i, j))))
-                    if guess_words_length < min:
-                        highestReductionWord = guess
-                        min = guess_words_length
-                available_words = filter_words(available_words, highestReductionWord, test_word)
-                steps += 1
-            if len(available_words) == 1 and available_words[0] == test_word:
-                # print(available_words[0], "steps:", steps)
-                game_data.update({str(steps): game_data[str(steps)] + 1})
-            elif test_word not in available_words:
-                raise RuntimeError("Answer not in list")
-        if len(available_words) != 1 and available_words[0] != test_word:
-            game_data.update({"DNF": game_data["DNF"] + 1})
-        success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-        print("bestFirstPairHighestReductionDynamicDictionary", game_data, success_rate, game_data_avg(game_data))
+# def test_bestFirstPairHighestReductionDynamicDictionary(n):
+#     game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
+#     letter_dictionary = get_letter_dictionary(available_words)
+#     for i in range(n):
+#         available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
+#         test_word = random.choice(available_words)
+#         available_words = filter_words(available_words, best_pair_first_word, test_word)
+#         # print(available_words)
+#         available_words = filter_words(available_words, best_pair_second_word, test_word)
+#         # print(available_words)
+#         steps = 2
+#         for int in range(4):
+#             if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
+#                 available_words = filter_words(available_words, random.choice(available_words), test_word)
+#                 steps += 1
+#             else:
+#                 min = len(available_words)
+#                 letter_dictionary = get_letter_dictionary(available_words)
+#                 for j in range(100):
+#                     guess = random.choice(available_words)
+#                     guess_words_length = len(filter_words(available_words, guess, max(available_words, key= lambda i=guess, j=letter_dictionary: get_word_value(i, j))))
+#                     if guess_words_length < min:
+#                         highestReductionWord = guess
+#                         min = guess_words_length
+#                 available_words = filter_words(available_words, highestReductionWord, test_word)
+#                 steps += 1
+#             if len(available_words) == 1 and available_words[0] == test_word:
+#                 # print(available_words[0], "steps:", steps)
+#                 game_data.update({str(steps): game_data[str(steps)] + 1})
+#             elif test_word not in available_words:
+#                 raise RuntimeError("Answer not in list")
+#         if len(available_words) != 1 and available_words[0] != test_word:
+#             game_data.update({"DNF": game_data["DNF"] + 1})
+#         success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+#         print("bestFirstPairHighestReductionDynamicDictionary", game_data, success_rate, game_data_avg(game_data))
 
-def test_bestFirstPairHighestReduction(n):
-    game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
-    for i in range(n):
-        available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
-        test_word = random.choice(available_words)
-        available_words = filter_words(available_words, best_pair_first_word, test_word)
-        # print(available_words)
-        available_words = filter_words(available_words, best_pair_second_word, test_word)
-        # print(available_words)
-        steps = 2
-        for int in range(4):
-            if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
-                available_words = filter_words(available_words, random.choice(available_words), test_word)
-                steps += 1
-            else:
-                min = len(available_words)
-                for j in range(100):
-                    guess = random.choice(available_words)
-                    guess_words_length = len(filter_words(available_words, guess, max(available_words, key=get_word_value)))
-                    if guess_words_length < min:
-                        highestReductionWord = guess
-                        min = guess_words_length
-                available_words = filter_words(available_words, highestReductionWord, test_word)
-                steps += 1
-            if len(available_words) == 1 and available_words[0] == test_word:
-                # print(available_words[0], "steps:", steps)
-                game_data.update({str(steps): game_data[str(steps)] + 1})
-            elif test_word not in available_words:
-                raise RuntimeError("AnswerNotInList")
-        if len(available_words) != 1 and available_words[0] != test_word:
-            game_data.update({"DNF": game_data["DNF"] + 1})
-        success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-        print("bestFirstPairHighestReduction", game_data, success_rate, game_data_avg(game_data))
+# def test_bestFirstPairHighestReduction(n):
+#     game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
+#     for i in range(n):
+#         available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
+#         test_word = random.choice(available_words)
+#         available_words = filter_words(available_words, best_pair_first_word, test_word)
+#         # print(available_words)
+#         available_words = filter_words(available_words, best_pair_second_word, test_word)
+#         # print(available_words)
+#         steps = 2
+#         for int in range(4):
+#             if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
+#                 available_words = filter_words(available_words, random.choice(available_words), test_word)
+#                 steps += 1
+#             else:
+#                 min = len(available_words)
+#                 for j in range(100):
+#                     guess = random.choice(available_words)
+#                     guess_words_length = len(filter_words(available_words, guess, max(available_words, key=get_word_value)))
+#                     if guess_words_length < min:
+#                         highestReductionWord = guess
+#                         min = guess_words_length
+#                 available_words = filter_words(available_words, highestReductionWord, test_word)
+#                 steps += 1
+#             if len(available_words) == 1 and available_words[0] == test_word:
+#                 # print(available_words[0], "steps:", steps)
+#                 game_data.update({str(steps): game_data[str(steps)] + 1})
+#             elif test_word not in available_words:
+#                 raise RuntimeError("AnswerNotInList")
+#         if len(available_words) != 1 and available_words[0] != test_word:
+#             game_data.update({"DNF": game_data["DNF"] + 1})
+#         success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+#         print("bestFirstPairHighestReduction", game_data, success_rate, game_data_avg(game_data))
 
-def test_highestReduction(n):
-    game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
-    for i in range(n):
-        available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
-        test_word = random.choice(available_words)
-        steps = 0
-        for int in range(6):
-            if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
-                available_words = filter_words(available_words, random.choice(available_words), test_word)
-            else:
-                min = len(available_words)
-                for i in range(10):
-                    guess = random.choice(available_words)
-                    guess_words_length = len(filter_words(available_words, guess, max(available_words, key= lambda guess, letter_dictionary: get_word_value(guess,letter_dictionary))))
-                    if guess_words_length < min:
-                        highestReductionWord = guess
-                        min = guess_words_length
-                available_words = filter_words(available_words, highestReductionWord, test_word)
-                steps += 1
-            if len(available_words) == 1 and available_words[0] == test_word:
-                # print(available_words[0], "steps:", steps)
-                game_data.update({str(steps): game_data[str(steps)] + 1})
-            elif test_word not in available_words:
-                raise RuntimeError("Answer not in list")
-        if len(available_words) != 1 and available_words[0] != test_word:
-            game_data.update({"DNF": game_data["DNF"] + 1})
-        success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-        print("highestReduction", game_data, success_rate, game_data_avg(game_data))
+# def test_highestReduction(n):
+#     game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
+#     for i in range(n):
+#         available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
+#         test_word = random.choice(available_words)
+#         steps = 0
+#         for int in range(6):
+#             if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
+#                 available_words = filter_words(available_words, random.choice(available_words), test_word)
+#             else:
+#                 min = len(available_words)
+#                 for i in range(10):
+#                     guess = random.choice(available_words)
+#                     guess_words_length = len(filter_words(available_words, guess, max(available_words, key= lambda guess, letter_dictionary: get_word_value(guess,letter_dictionary))))
+#                     if guess_words_length < min:
+#                         highestReductionWord = guess
+#                         min = guess_words_length
+#                 available_words = filter_words(available_words, highestReductionWord, test_word)
+#                 steps += 1
+#             if len(available_words) == 1 and available_words[0] == test_word:
+#                 # print(available_words[0], "steps:", steps)
+#                 game_data.update({str(steps): game_data[str(steps)] + 1})
+#             elif test_word not in available_words:
+#                 raise RuntimeError("Answer not in list")
+#         if len(available_words) != 1 and available_words[0] != test_word:
+#             game_data.update({"DNF": game_data["DNF"] + 1})
+#         success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+#         print("highestReduction", game_data, success_rate, game_data_avg(game_data))
 
-def test_firstPairBest(n):
-    game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
-    for i in range(n):
-        available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
-        test_word = random.choice(available_words)
-        available_words = filter_words(available_words, best_pair_first_word, test_word)
-        # print(available_words)
-        available_words = filter_words(available_words, best_pair_second_word, test_word)
-        # print(available_words)
-        steps = 2
-        for i in range(4):
-            if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
-                available_words = filter_words(available_words, random.choice(available_words), test_word)
-            else:
-                available_words = filter_words(available_words, max(available_words, key=get_word_value), test_word)
-                steps += 1
-            if len(available_words) == 1 and available_words[0] == test_word:
-                # print(available_words[0], "steps:", steps)
-                game_data.update({str(steps): game_data[str(steps)] + 1})
-            elif test_word not in available_words:
-                raise RuntimeError("AnswerNotInList")
-        if len(available_words) != 1 and available_words[0] != test_word:
-            game_data.update({"DNF": game_data["DNF"] + 1})
-        success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-        print("firstPairBest", game_data, success_rate, game_data_avg(game_data))
+# def test_firstPairBest(n):
+#     game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
+#     for i in range(n):
+#         available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
+#         test_word = random.choice(available_words)
+#         available_words = filter_words(available_words, best_pair_first_word, test_word)
+#         # print(available_words)
+#         available_words = filter_words(available_words, best_pair_second_word, test_word)
+#         # print(available_words)
+#         steps = 2
+#         for i in range(4):
+#             if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
+#                 available_words = filter_words(available_words, random.choice(available_words), test_word)
+#             else:
+#                 available_words = filter_words(available_words, max(available_words, key=get_word_value), test_word)
+#                 steps += 1
+#             if len(available_words) == 1 and available_words[0] == test_word:
+#                 # print(available_words[0], "steps:", steps)
+#                 game_data.update({str(steps): game_data[str(steps)] + 1})
+#             elif test_word not in available_words:
+#                 raise RuntimeError("AnswerNotInList")
+#         if len(available_words) != 1 and available_words[0] != test_word:
+#             game_data.update({"DNF": game_data["DNF"] + 1})
+#         success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+#         print("firstPairBest", game_data, success_rate, game_data_avg(game_data))
 
-def test_BestFirst(n):
-    game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
-    for i in range(n):
-        available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
-        test_word = random.choice(available_words)
-        steps = 0
-        for int in range(6):
-            if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
-                available_words = filter_words(available_words, random.choice(available_words), test_word)
-            available_words = filter_words(available_words, max(available_words, key=get_word_value), test_word)
-            steps += 1
-            if len(available_words) == 1 and available_words[0] == test_word:
-                # print(available_words[0], "steps:", steps)
-                game_data.update({str(steps): game_data[str(steps)] + 1})
-            elif test_word not in available_words:
-                raise RuntimeError("AnswerNotInList")
-        if len(available_words) != 1 and available_words[0] != test_word:
-            game_data.update({"DNF": game_data["DNF"] + 1})
-        success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-        print("bestFirst", game_data, success_rate, game_data_avg(game_data))
-        
+# def test_BestFirst(n):
+#     game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
+#     for i in range(n):
+#         available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
+#         test_word = random.choice(available_words)
+#         steps = 0
+#         for int in range(6):
+#             if len(available_words) <= (5 - int):   #if the number of possible answers are less than the guesses left, it will randomly guess
+#                 available_words = filter_words(available_words, random.choice(available_words), test_word)
+#             available_words = filter_words(available_words, max(available_words, key=get_word_value), test_word)
+#             steps += 1
+#             if len(available_words) == 1 and available_words[0] == test_word:
+#                 # print(available_words[0], "steps:", steps)
+#                 game_data.update({str(steps): game_data[str(steps)] + 1})
+#             elif test_word not in available_words:
+#                 raise RuntimeError("AnswerNotInList")
+#         if len(available_words) != 1 and available_words[0] != test_word:
+#             game_data.update({"DNF": game_data["DNF"] + 1})
+#         success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+#         print("bestFirst", game_data, success_rate, game_data_avg(game_data))
+
     
 def filter_words(available_words, guess, answer):
     return_list = [word for word in available_words]
@@ -303,7 +303,7 @@ def has_common_letters(word_1, word_2):
 # test_bestFirstPairHighestReductionDynamicDictionary(1000)
 # test_algorithm6(1000)
 
-def get_word_value2(word, word_list):   #lower is better
+def get_word_value2(word, word_list):   #goes through all the combinations of letter states for the word and returns a score based on the weighted average (lower is better)
     reset_list = [word for word in word_list]
     resulting_words_list_lengths = []
     for first_letter in range(3):
@@ -311,6 +311,8 @@ def get_word_value2(word, word_list):   #lower is better
             for third_letter in range(3):
                 for fourth_letter in range(3):
                     for fifth_letter in range(3):
+                        # if random.random() < .9:    #added to speed things up
+                        #     continue
                         if first_letter == 0:
                             word_list = inverseFilter(word[0], word_list)
                         elif first_letter == 1:
@@ -340,99 +342,128 @@ def get_word_value2(word, word_list):   #lower is better
                         elif fifth_letter == 1:
                             word_list = filter(word[4], wordList=word_list)
                         elif fifth_letter == 2:
-                            word_list = filter(word[4], position=4, wordList=word_list)
-                        resulting_words_list_lengths.append(len(word_list))
+                            word_list = filter(word[4], position=4, wordList=word_list) #returns length of resulting list multiplied by how likely it is to appear
+                        print("Testing word state", first_letter * 81 + second_letter * 27 + third_letter * 9 + fourth_letter * 3 + fifth_letter * 1)
+                        # resulting_words_list_lengths.append(len(word_list) * get_word_weighting_random(word, word_list, reset_list, 40))
+                        resulting_words_list_lengths.append(len(word_list) * get_word_weighting(word, word_list, reset_list))
                         word_list = [word for word in reset_list]
-    return sum(resulting_words_list_lengths) / 243
+    return sum(resulting_words_list_lengths) / len(resulting_words_list_lengths)
 
-def get_word_value4(word, word_list):   #lower is better
-    resulting_words_list_lengths = []
-    for first_letter in range(3):
-        for second_letter in range(3):
-            for third_letter in range(3):
-                for fourth_letter in range(3):
-                    for fifth_letter in range(3):
-                        if first_letter == 0:
-                            word_list = inverseFilter(word[0], word_list)
-                        elif first_letter == 1:
-                            word_list = filter(word[0], wordList=word_list)
-                        elif first_letter == 2:
-                            word_list = filter(word[0], position=0, wordList=word_list)
-                        if second_letter == 0:
-                            word_list = inverseFilter(word[1], word_list)
-                        elif second_letter == 1:
-                            word_list = filter(word[1], wordList=word_list)
-                        elif second_letter == 2:
-                            word_list = filter(word[1], position=1, wordList=word_list)
-                        if third_letter == 0:
-                            word_list = inverseFilter(word[2], word_list)
-                        elif third_letter == 1:
-                            word_list = filter(word[2], wordList=word_list)
-                        elif third_letter == 2:
-                            word_list = filter(word[2], position=2, wordList=word_list)
-                        if fourth_letter == 0:
-                            word_list = inverseFilter(word[3], word_list)
-                        elif fourth_letter == 1:
-                            word_list = filter(word[3], wordList=word_list)
-                        elif fourth_letter == 2:
-                            word_list = filter(word[3], position=3, wordList=word_list)
-                        if fifth_letter == 0:
-                            word_list = inverseFilter(word[4], word_list)
-                        elif fifth_letter == 1:
-                            word_list = filter(word[4], wordList=word_list)
-                        elif fifth_letter == 2:
-                            word_list = filter(word[4], position=4, wordList=word_list)
-                            for word2 in word_list:
-                                for first_letter2 in range(3):
-                                        for second_letter2 in range(3):
-                                            for third_letter2 in range(3):
-                                                for fourth_letter2 in range(3):
-                                                    for fifth_letter2 in range(3):
-                                                        if first_letter2 == 0:
-                                                            word_list2 = inverseFilter(word2[0], word_list)
-                                                        elif first_letter2 == 1:
-                                                            word_list2 = filter(word2[0], wordList=word_list)
-                                                        elif first_letter2 == 2:
-                                                            word_list2 = filter(word2[0], position=0, wordList=word_list)
-                                                        if second_letter2 == 0:
-                                                            word_list2 = inverseFilter(word2[1], word_list)
-                                                        elif second_letter2 == 1:
-                                                            word_list2 = filter(word2[1], wordList=word_list)
-                                                        elif second_letter2 == 2:
-                                                            word_list2 = filter(word2[1], position=1, wordList=word_list)
-                                                        if third_letter2 == 0:
-                                                            word_list2 = inverseFilter(word2[2], word_list)
-                                                        elif third_letter2 == 1:
-                                                            word_list2 = filter(word2[2], wordList=word_list)
-                                                        elif third_letter2 == 2:
-                                                            word_list2 = filter(word2[2], position=2, wordList=word_list)
-                                                        if fourth_letter2 == 0:
-                                                            word_list2 = inverseFilter(word2[3], word_list)
-                                                        elif fourth_letter2 == 1:
-                                                            word_list2 = filter(word2[3], wordList=word_list)
-                                                        elif fourth_letter2 == 2:
-                                                            word_list2 = filter(word2[3], position=3, wordList=word_list)
-                                                        if fifth_letter2 == 0:
-                                                            word_list2 = inverseFilter(word2[4], word_list)
-                                                        elif fifth_letter2 == 1:
-                                                            word_list2 = filter(word2[4], wordList=word_list)
-                                                        elif fifth_letter2 == 2:
-                                                            word_list2 = filter(word2[4], position=4, wordList=word_list)
-                                                            resulting_words_list_lengths.append(len(word_list2))
-    return sum(resulting_words_list_lengths) / (243 ** 2)
+def get_word_weighting(input_word, focused_list, main_list):    #iterates through the main list and returns the percent of filtered lists from the main list that match the focused list
+    reset_list = [word for word in main_list]
+    matches = 0
+    for word in main_list:
+        if word == input_word:
+            continue
+        main_list = filter_words(main_list, input_word, word)
+        if main_list == focused_list:
+            matches += 1
+            print("Matches found:", matches)
+        main_list = reset_list
+    return matches / len(main_list)
+
+def get_word_weighting_random(input_word, focused_list, main_list, n):    #randomly chooses a number of data points in the main list and returns the percent of filtered lists from the main list that match the focused list
+    reset_list = [word for word in main_list]
+    matches = 0
+    for int in range(n):
+        word = random.choice(main_list)
+        while word == input_word:
+            word = random.choice(main_list)
+        main_list = filter_words(main_list, input_word, word)
+        if main_list == focused_list:
+            matches += 1
+            print("Matches found:", matches)
+        main_list = reset_list
+    return matches / len(main_list)
+
+# def get_word_value4(word, word_list):   #lower is better
+#     resulting_words_list_lengths = []
+#     for first_letter in range(3):
+#         for second_letter in range(3):
+#             for third_letter in range(3):
+#                 for fourth_letter in range(3):
+#                     for fifth_letter in range(3):
+#                         if first_letter == 0:
+#                             word_list = inverseFilter(word[0], word_list)
+#                         elif first_letter == 1:
+#                             word_list = filter(word[0], wordList=word_list)
+#                         elif first_letter == 2:
+#                             word_list = filter(word[0], position=0, wordList=word_list)
+#                         if second_letter == 0:
+#                             word_list = inverseFilter(word[1], word_list)
+#                         elif second_letter == 1:
+#                             word_list = filter(word[1], wordList=word_list)
+#                         elif second_letter == 2:
+#                             word_list = filter(word[1], position=1, wordList=word_list)
+#                         if third_letter == 0:
+#                             word_list = inverseFilter(word[2], word_list)
+#                         elif third_letter == 1:
+#                             word_list = filter(word[2], wordList=word_list)
+#                         elif third_letter == 2:
+#                             word_list = filter(word[2], position=2, wordList=word_list)
+#                         if fourth_letter == 0:
+#                             word_list = inverseFilter(word[3], word_list)
+#                         elif fourth_letter == 1:
+#                             word_list = filter(word[3], wordList=word_list)
+#                         elif fourth_letter == 2:
+#                             word_list = filter(word[3], position=3, wordList=word_list)
+#                         if fifth_letter == 0:
+#                             word_list = inverseFilter(word[4], word_list)
+#                         elif fifth_letter == 1:
+#                             word_list = filter(word[4], wordList=word_list)
+#                         elif fifth_letter == 2:
+#                             word_list = filter(word[4], position=4, wordList=word_list)
+#                             for word2 in word_list:
+#                                 for first_letter2 in range(3):
+#                                         for second_letter2 in range(3):
+#                                             for third_letter2 in range(3):
+#                                                 for fourth_letter2 in range(3):
+#                                                     for fifth_letter2 in range(3):
+#                                                         if first_letter2 == 0:
+#                                                             word_list2 = inverseFilter(word2[0], word_list)
+#                                                         elif first_letter2 == 1:
+#                                                             word_list2 = filter(word2[0], wordList=word_list)
+#                                                         elif first_letter2 == 2:
+#                                                             word_list2 = filter(word2[0], position=0, wordList=word_list)
+#                                                         if second_letter2 == 0:
+#                                                             word_list2 = inverseFilter(word2[1], word_list)
+#                                                         elif second_letter2 == 1:
+#                                                             word_list2 = filter(word2[1], wordList=word_list)
+#                                                         elif second_letter2 == 2:
+#                                                             word_list2 = filter(word2[1], position=1, wordList=word_list)
+#                                                         if third_letter2 == 0:
+#                                                             word_list2 = inverseFilter(word2[2], word_list)
+#                                                         elif third_letter2 == 1:
+#                                                             word_list2 = filter(word2[2], wordList=word_list)
+#                                                         elif third_letter2 == 2:
+#                                                             word_list2 = filter(word2[2], position=2, wordList=word_list)
+#                                                         if fourth_letter2 == 0:
+#                                                             word_list2 = inverseFilter(word2[3], word_list)
+#                                                         elif fourth_letter2 == 1:
+#                                                             word_list2 = filter(word2[3], wordList=word_list)
+#                                                         elif fourth_letter2 == 2:
+#                                                             word_list2 = filter(word2[3], position=3, wordList=word_list)
+#                                                         if fifth_letter2 == 0:
+#                                                             word_list2 = inverseFilter(word2[4], word_list)
+#                                                         elif fifth_letter2 == 1:
+#                                                             word_list2 = filter(word2[4], wordList=word_list)
+#                                                         elif fifth_letter2 == 2:
+#                                                             word_list2 = filter(word2[4], position=4, wordList=word_list)
+#                                                             resulting_words_list_lengths.append(len(word_list2))
+#     return sum(resulting_words_list_lengths) / (243 ** 2)
 
 def get_best_next(available_words):
     min = len(available_words)
     min_word = available_words[0]
     for word in available_words:
+        # if random.random() < .9:    #added to speed things up
+        #     continue
+        print(("TESTING " + word.upper() + " " + str(available_words.index(word)) + "\n") * 50)
         word_value = get_word_value2(word, available_words)
         if word_value < min:
             min = word_value
             min_word = word
             # print(min_word, min)
-        if available_words.index(word) % 100 == 0:
-            print(available_words.index(word))
-    print(min_word)
     return min_word
 
 def test_highestReductionButForReal(n):
@@ -457,10 +488,10 @@ def test_highestReductionButForReal(n):
                 game_data.update({str(steps): game_data[str(steps)] + 1})
             elif test_word not in available_words:
                 raise RuntimeError("Answer not in list")
-            # print(available_words)
+            print(available_words)
         if len(available_words) != 1 and available_words[0] != test_word:
             game_data.update({"DNF": game_data["DNF"] + 1})
         success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
         print("hrbfr", game_data, success_rate, game_data_avg(game_data))
         
-test_highestReductionButForReal(100)
+test_highestReductionButForReal(1)
