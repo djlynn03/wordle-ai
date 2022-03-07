@@ -95,67 +95,61 @@ def has_common_letters(word_1, word_2):
             return True
     return False
 
-# def get_word_value2(word, word_list):   #goes through all the combinations of letter states for the word and returns a score based on the weighted average (lower is better)
-#     reset_list = [word for word in word_list]
-#     resulting_words_list_lengths = []
-#     for first_letter in range(3):
-#         for second_letter in range(3):
-#             for third_letter in range(3):
-#                 for fourth_letter in range(3):
-#                     for fifth_letter in range(3):
-#                         if random_test == True:
-#                             if random.random() < .9:    #added to speed things up
-#                                 continue
-#                         if first_letter == 0:
-#                             word_list = inverseFilter(word[0], word_list)
-#                         elif first_letter == 1:
-#                             word_list = filter(word[0], wordList=word_list)
-#                         elif first_letter == 2:
-#                             word_list = filter(word[0], position=0, wordList=word_list)
-#                         if second_letter == 0:
-#                             word_list = inverseFilter(word[1], word_list)
-#                         elif second_letter == 1:
-#                             word_list = filter(word[1], wordList=word_list)
-#                         elif second_letter == 2:
-#                             word_list = filter(word[1], position=1, wordList=word_list)
-#                         if third_letter == 0:
-#                             word_list = inverseFilter(word[2], word_list)
-#                         elif third_letter == 1:
-#                             word_list = filter(word[2], wordList=word_list)
-#                         elif third_letter == 2:
-#                             word_list = filter(word[2], position=2, wordList=word_list)
-#                         if fourth_letter == 0:
-#                             word_list = inverseFilter(word[3], word_list)
-#                         elif fourth_letter == 1:
-#                             word_list = filter(word[3], wordList=word_list)
-#                         elif fourth_letter == 2:
-#                             word_list = filter(word[3], position=3, wordList=word_list)
-#                         if fifth_letter == 0:
-#                             word_list = inverseFilter(word[4], word_list)
-#                         elif fifth_letter == 1:
-#                             word_list = filter(word[4], wordList=word_list)
-#                         elif fifth_letter == 2:
-#                             word_list = filter(word[4], position=4, wordList=word_list) #returns length of resulting list multiplied by how likely it is to appear
-#                         print("Testing word state", first_letter * 81 + second_letter * 27 + third_letter * 9 + fourth_letter * 3 + fifth_letter * 1)
-#                         if random_test == True:
-#                             resulting_words_list_lengths.append(len(word_list) * get_word_weighting_random(word, word_list, reset_list, 40))
-#                         else:
-#                             resulting_words_list_lengths.append(len(word_list) * get_word_weighting(word, word_list, reset_list))
-#                         word_list = [word for word in reset_list]
-#     return sum(resulting_words_list_lengths) / len(resulting_words_list_lengths)
+def get_word_value2(word, word_list):   #goes through all the combinations of letter states for the word and returns a score based on the weighted average (lower is better)
+    reset_list = [word for word in word_list]
+    resulting_words_list_lengths = []
+    for first_letter in range(3):
+        for second_letter in range(3):
+            for third_letter in range(3):
+                for fourth_letter in range(3):
+                    for fifth_letter in range(3):
+                        if first_letter == 0:
+                            word_list = inverseFilter(word[0], word_list)
+                        elif first_letter == 1:
+                            word_list = filter(word[0], wordList=word_list)
+                        elif first_letter == 2:
+                            word_list = filter(word[0], position=0, wordList=word_list)
+                        if second_letter == 0:
+                            word_list = inverseFilter(word[1], word_list)
+                        elif second_letter == 1:
+                            word_list = filter(word[1], wordList=word_list)
+                        elif second_letter == 2:
+                            word_list = filter(word[1], position=1, wordList=word_list)
+                        if third_letter == 0:
+                            word_list = inverseFilter(word[2], word_list)
+                        elif third_letter == 1:
+                            word_list = filter(word[2], wordList=word_list)
+                        elif third_letter == 2:
+                            word_list = filter(word[2], position=2, wordList=word_list)
+                        if fourth_letter == 0:
+                            word_list = inverseFilter(word[3], word_list)
+                        elif fourth_letter == 1:
+                            word_list = filter(word[3], wordList=word_list)
+                        elif fourth_letter == 2:
+                            word_list = filter(word[3], position=3, wordList=word_list)
+                        if fifth_letter == 0:
+                            word_list = inverseFilter(word[4], word_list)
+                        elif fifth_letter == 1:
+                            word_list = filter(word[4], wordList=word_list)
+                        elif fifth_letter == 2:
+                            word_list = filter(word[4], position=4, wordList=word_list) #returns length of resulting list multiplied by how likely it is to appear
+                        # print("Testing word state", first_letter * 81 + second_letter * 27 + third_letter * 9 + fourth_letter * 3 + fifth_letter * 1)
+                        resulting_words_list_lengths.append(len(word_list) * get_word_weighting(word, word_list, reset_list))
+                        word_list = [word for word in reset_list]
+    return sum(resulting_words_list_lengths) / len(resulting_words_list_lengths)
 
-# def get_word_weighting(input_word, focused_list, main_list):    #iterates through the main list and returns the percent of filtered lists from the main list that match the focused list
-#     reset_list = [word for word in main_list]
-#     matches = 0
-#     for word in main_list:
-#         if word == input_word:
-#             continue
-#         main_list = filter_words(main_list, input_word, word)
-#         if main_list == focused_list:
-#             matches += 1
-#             print("Matches found:", matches)
-#         main_list = reset_list
-#     return matches / len(main_list)
+def get_word_weighting(input_word, focused_list, main_list):    #iterates through the main list and returns the percent of filtered lists from the main list that match the focused list
+    reset_list = [word for word in main_list]
+    matches = 0
+    for word in main_list:
+        if word == input_word:
+            continue
+        main_list = filter_words(main_list, input_word, word)
+        if main_list == focused_list:
+            matches += 1
+            # print("Matches found:", matches)
+        main_list = reset_list
+    return matches / len(main_list)
 
 # def get_word_weighting_random(input_word, focused_list, main_list, n):    #randomly chooses a number of data points in the main list and returns the percent of filtered lists from the main list that match the focused list
 #     reset_list = [word for word in main_list]
@@ -171,16 +165,17 @@ def has_common_letters(word_1, word_2):
 #         main_list = reset_list
 #     return matches / len(main_list)
 
-# def get_best_next(available_words):
-#     max = len(available_words)
-#     max_word = available_words[0]
-#     for guessWord in available_words:
-#         word_value = getWordValue(getWordWeight(guessWord, ), wordScore)
-#         if word_value < max:
-#             max = word_value
-#             max_word = guessWord
-#             # print(min_word, min)
-#     return max_word
+def get_best_next(available_words):
+    min = len(available_words)
+    min_word = available_words[0]
+    for word in available_words:
+        # print("Testing word", available_words.index(word))
+        word_value = get_word_value2(word, available_words)
+        if word_value < min:
+            min = word_value
+            min_word = word
+            # print(min_word, min)
+    return min_word
 
 def getNextBest(wordList):
     maxScore = 0
@@ -219,13 +214,13 @@ def getNextBestRandom(wordList, n):
                                 bestNext = word
     return bestNext
 
-def test_highestReductionByValue(n):
+def test_highestReductionButForReal(n):
     game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
     for i in range(n):
         available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
         test_word = random.choice(available_words)
         available_words
-        available_words = filter_words(available_words, "soare", test_word)
+        available_words = filter_words(available_words, "salet", test_word)
         steps = 1
         if len(available_words) == 1 and available_words[0] == test_word:
             # print(available_words[0], "steps:", steps)
@@ -234,8 +229,8 @@ def test_highestReductionByValue(n):
         elif test_word not in available_words:
             raise RuntimeError("Answer not in list")
         for j in range(5):
-            print("Step 1:", j + 1, "Possible words:", len(available_words))
-            available_words = filter_words(available_words, getNextBestRandom(available_words, 100), test_word)
+            print("Step:", j + 1, "Possible words:", len(available_words))
+            available_words = filter_words(available_words, get_best_next(available_words), test_word)
             steps += 1
             if len(available_words) == 1 and available_words[0] == test_word:
                 # print(available_words[0], "steps:", steps)
@@ -248,7 +243,7 @@ def test_highestReductionByValue(n):
                 break
         print("Possible words:", len(available_words))
         success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-        print("hrbv", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
+        print("hrbfr", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
 
 def getWordState(guessWord, checkWord):
     returnv = [0,0,0,0,0]
@@ -279,4 +274,4 @@ def getWordValue(wordWeight, wordScore):
 
 # print(getWordWeight("soare", [0, 0, 0, 0, 0], available_words))
 
-test_highestReductionByValue(100)
+test_highestReductionButForReal(1000)
