@@ -2,8 +2,6 @@ import random
 import threading
 import math
 
-available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
-
 def get_letter_dictionary(word_list):   #gets a letter dictionary of the frequencies of each letter in the word list
     letter_dictionary = {}
     for letter in "abcdefghijklmnopqrstuvwxyz":
@@ -313,7 +311,7 @@ def runMultithreadedHRBFR2(wordList, numberOfThreads):   #gets the next best wor
 def test_MultiThreadedHRBFR2(n):
     game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
     for i in range(n):
-        available_words = [i[:-1] for i in open("wordsAllowed.txt", "r").readlines()]
+        available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
         test_word = random.choice(available_words)
         available_words = filter_words(available_words, "salet", test_word)
         steps = 1
@@ -345,3 +343,75 @@ def test_MultiThreadedHRBFR2(n):
                 break
 
 test_MultiThreadedHRBFR2(1000)
+
+def gameFilter(word, wordState, word_list):   #filters words using game output information
+    first_letter = int(wordState[0])
+    second_letter = int(wordState[1])
+    third_letter = int(wordState[2])
+    fourth_letter = int(wordState[3])
+    fifth_letter = int(wordState[4])
+    if first_letter == 0:
+        word_list = inverseFilter(word[0], word_list)
+    elif first_letter == 1:
+        word_list = filter(word[0], wordList=word_list)
+        word_list = wrongPositionFilter(word[0], 0, word_list)
+    elif first_letter == 2:
+        word_list = filter(word[0], position=0, wordList=word_list)
+    if second_letter == 0:
+        word_list = inverseFilter(word[1], word_list)
+    elif second_letter == 1:
+        word_list = filter(word[1], wordList=word_list)
+        word_list = wrongPositionFilter(word[1], 1, word_list)
+    elif second_letter == 2:
+        word_list = filter(word[1], position=1, wordList=word_list)
+    if third_letter == 0:
+        word_list = inverseFilter(word[2], word_list)
+    elif third_letter == 1:
+        word_list = filter(word[2], wordList=word_list)
+        word_list = wrongPositionFilter(word[2], 2, word_list)
+    elif third_letter == 2:
+        word_list = filter(word[2], position=2, wordList=word_list)
+    if fourth_letter == 0:
+        word_list = inverseFilter(word[3], word_list)
+    elif fourth_letter == 1:
+        word_list = filter(word[3], wordList=word_list)
+        word_list = wrongPositionFilter(word[3], 3, word_list)
+    elif fourth_letter == 2:
+        word_list = filter(word[3], position=3, wordList=word_list)
+    if fifth_letter == 0:
+        word_list = inverseFilter(word[4], word_list)
+    elif fifth_letter == 1:
+        word_list = filter(word[4], wordList=word_list)
+        word_list = wrongPositionFilter(word[3], 3, word_list)
+    elif fifth_letter == 2:
+        word_list = filter(word[4], position=4, wordList=word_list)
+    return word_list
+
+def validState(wordState):  #returns whether or not a word state is valid
+    if len(wordState) != 5:
+        return False
+    else:
+        try:
+            for char in wordState:
+                if int(char) < 0 or int(char) > 2:
+                    return False
+        except:
+            return False
+    return True
+
+available_words = [i[:-1] for i in open("wordsAllowed.txt", "r").readlines()]
+
+def gameSim(wordList=available_words):  #simulates a real game
+    for i in range(6):
+        word = input("Enter word: ")
+        wordState = input("Enter word state: ")
+        while not validState(wordState):
+            word = input("Enter word: ")
+            wordState = input("Enter word state: ")
+        wordList = gameFilter(word, wordState, wordList)
+        print(runMultithreadedHRBFR2(wordList, len(wordList)))
+        gameStatus = input("Complete? (y/N): ")
+        if gameStatus == 'Y' or gameStatus == 'y':
+            break
+
+# gameSim()
