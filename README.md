@@ -6,7 +6,7 @@ This AI currently has an accuracy of approximately 99.9% and an average steps-pe
 In the image above, the number of guesses it took to guess the word is shown in a dictionary (1: 0, 2: 300...).
 The numbers following the dictionary is the accuracy (percent of games completed) and the average steps per completed game, respectively.
 <br>
-Using the full allowed words list, the AI has an accuracy of approximately 99.9% and an average steps-per-game of 2.86-
+Using the full allowed words list, the AI has an accuracy of approximately 99% and an average steps-per-game of 3.69-
 <br>
 ![AccuracyFull](accuracy2.png)
 <br>
