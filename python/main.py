@@ -146,7 +146,7 @@ def getBlimpMax(wordList, commonLetters, totalWords=wordsAllowed): #returns high
     return max(wordValues, key=wordValues.get)
 
 def blimpSearch(wordList):  #made to avoid the "blimp problem" where a search would be narrowed down best by a word already filtered out
-    threshold = math.floor(len(wordList)/2) # ex: match, batch, latch are possible answers, blimp would be a good filter word
+    threshold = math.floor(len(wordList)/2) # ex: match, batch, latch, patch are possible answers, blimp would be a good filter word
     commonLettersDict = {}
     blimpWords = {}
     for word1 in wordList:
