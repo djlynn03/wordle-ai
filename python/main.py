@@ -127,7 +127,8 @@ def isBlimp(wordList):   #returns whether or not a word list has the "blimp prob
         for word2 in wordList:
             if word2 == word1:
                 continue
-            if len(list(set(word1) & set(word2))) >= 3: # if words have at least 3 letters in common
+            length = len(list(set(word1) & set(word2)))
+            if length >= 3 and length != 5: # if words have at least 3 letters in common
                 commonLetters = ""
                 for letters in list(set(word1) & set(word2)):
                     commonLetters += letters
@@ -153,7 +154,8 @@ def blimpSearch(wordList):  #made to avoid the "blimp problem" where a search wo
         for word2 in wordList:
             if word2 == word1:
                 continue
-            if len(list(set(word1) & set(word2))) >= 3: # if words have at least 3 letters in common
+            length = len(list(set(word1) & set(word2)))
+            if length >= 3 and length != 5: # if words have at least 3 letters in common
                 commonLetters = ""
                 for letters in list(set(word1) & set(word2)):
                     commonLetters += letters
