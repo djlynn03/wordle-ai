@@ -43,7 +43,7 @@ for i in range(5):
         inputWord = gameEngine.blimpSearch(wordList)
     else:
         inputWord = gameEngine.getMaxValue1(wordList)
-        # inputWord = gameEngine.getMaxDeepSearch(wordList, len(wordList))
+        # inputWord = gameEngine.getMaxDeepSearch(wordList)
     keyboardIn(inputWord)
     wordList = gameEngine.gameFilter(inputWord, getWordState(i + 1), wordList)
 while(1):
