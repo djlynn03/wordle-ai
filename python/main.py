@@ -3,6 +3,7 @@ import threading
 import math
 
 available_words = [i[:-1] for i in open("words.txt", "r").readlines()]  #list of all possible answers
+permanent_answers = [i[:-1] for i in open("words.txt", "r").readlines()]  #list of all possible answers, not changed in code
 wordsAllowed = [i[:-1] for i in open("wordsAllowed.txt", "r").readlines()]  #list of all possible entries
 
 def get_letter_dictionary(word_list):   #gets a letter dictionary of the each letter and the number of times it appears in the word list
@@ -239,7 +240,7 @@ def get_word_value2(word, reset_list):   #goes through all the combinations of l
     if len(resulting_words_list_lengths) > 0:
         return sum(resulting_words_list_lengths) / len(reset_list)    #returns sum of weighted averages
     else:
-        return 1   #returns -1 if there are no resulting word lists (all states are impossible to reach)
+        return 1   #returns 1 if there are no resulting word lists (all states are impossible to reach)
 
 def get_list_matches(input_word, focused_list, main_list):    #iterates through the main list and returns the number of filtered lists from the main list that match the focused list
     reset_list = [word for word in main_list]
@@ -291,6 +292,7 @@ def getMaxValue1(wordList): #returns highest word by letter frequency
 
 def runMultithreadedHRBFR2(wordList, numberOfThreads):   #gets the next best word by highest reduction, using multithreading
     global min_word_dict
+    baseThreads = threading.active_count()
     min_word_dict = {"zzzzz": 9999}
     wordListList = []
     wordListList.append([wordList[i:i + math.ceil(len(wordList) / numberOfThreads)] for i in range(0, len(wordList), math.ceil(len(wordList) / numberOfThreads))])
@@ -301,10 +303,11 @@ def runMultithreadedHRBFR2(wordList, numberOfThreads):   #gets the next best wor
     threads = [Thread(get_best_next_multithread, "Thread " + str(i + 1), wordListList[0][i], wordList) for i in range(r)]
     for thread in threads:
         thread.start()
-    for thread in threads:
-        thread.join()
+    while(1):
+        if threading.active_count() == baseThreads:
+            break
     if len(min_word_dict) > 1:  # returns the word with the lowest score out of all the local minimums
-        print(min_word_dict)
+        # print(min_word_dict)
         best_word_list = []
         min_value = min_word_dict[min(min_word_dict, key=min_word_dict.get)]
         # print(min_value)
@@ -316,47 +319,6 @@ def runMultithreadedHRBFR2(wordList, numberOfThreads):   #gets the next best wor
     else:
         best_word = min(min_word_dict, key=min_word_dict.get)
     return best_word
-
-def test_MultiThreadedHRBFR2(n):    #tests deep search by highest weighted average list reduction
-    game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
-    for i in range(n):
-        available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
-        test_word = random.choice(available_words)
-        print(test_word)
-        steps = 1
-        if test_word == "salet":
-            print(steps, available_words)
-            game_data.update({str(steps): game_data[str(steps)] + 1})
-            success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-            print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
-            continue
-        available_words = filter_words(available_words, "salet", test_word)
-        if test_word not in available_words:
-            raise RuntimeError("Answer not in list")
-        if len(available_words) == 1 and available_words[0] == test_word:
-            steps += 1
-            # print(steps, available_words)
-            game_data.update({str(steps): game_data[str(steps)] + 1})
-            success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-            print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
-            continue
-        for j in range(5):
-            available_words = filter_words(available_words, runMultithreadedHRBFR2(available_words, 100), test_word)
-            steps += 1
-            # print(steps, available_words)
-            if test_word not in available_words:
-                raise RuntimeError("Answer not in list")
-            if len(available_words) == 1 and available_words[0] == test_word:
-                game_data.update({str(steps): game_data[str(steps)] + 1})
-                success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-                print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
-                break     
-        else:
-            game_data.update({"DNF": game_data["DNF"] + 1})
-            success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
-            print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
-
-# test_MultiThreadedHRBFR2(1)
 
 def gameFilter(word, wordState, word_list):   #filters words using game output information
     first_letter = int(wordState[0])
@@ -408,6 +370,92 @@ def gameFilter(word, wordState, word_list):   #filters words using game output i
     if len(set(list(word))) != len(word):
         word_list = word_state_repetition_filter(word, wordState, word_list)
     return word_list
+
+def test_MultiThreadedHRBFR2(n):    #tests deep search by highest weighted average list reduction
+    game_data = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "DNF": 0}
+    for i in range(n):
+        available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
+        test_word = random.choice(available_words)
+        steps = 1
+        if test_word == "salet":
+            print(steps, available_words)
+            game_data.update({str(steps): game_data[str(steps)] + 1})
+            success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+            print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
+            continue
+        available_words = filter_words(available_words, "salet", test_word)
+        if test_word not in available_words:
+            raise RuntimeError("Answer not in list")
+        if len(available_words) == 1 and available_words[0] == test_word:
+            steps += 1
+            # print(steps, available_words)
+            game_data.update({str(steps): game_data[str(steps)] + 1})
+            success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+            print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
+            continue
+        for j in range(5):
+            if isBlimp(available_words):
+                guess = blimpSearch(available_words)
+            else:
+                if available_words == gameFilter("salet", "00000", permanent_answers):  #hard-coded second guesses based on testing
+                    guess = "muddy"
+                elif available_words == gameFilter("salet", "10000", permanent_answers):
+                    guess = "hussy"
+                elif available_words == gameFilter("salet", "01000", permanent_answers):
+                    guess = "croak"
+                elif available_words == gameFilter("salet", "00100", permanent_answers):
+                    guess = "grill"
+                elif available_words == gameFilter("salet", "00010", permanent_answers):
+                    guess = "pique"
+                elif available_words == gameFilter("salet", "00001", permanent_answers):
+                    guess = "booth"
+                else:
+                    guess = runMultithreadedHRBFR2(available_words, len(available_words))
+            available_words = filter_words(available_words, guess, test_word)
+            steps += 1
+            # print(steps, available_words)
+            if test_word not in available_words:
+                raise RuntimeError("Answer not in list")
+            if len(available_words) == 1 and guess == test_word:
+                game_data.update({str(steps): game_data[str(steps)] + 1})
+                success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+                print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
+                break 
+            elif len(available_words) == 1 and available_words[0] == test_word:
+                steps += 1
+                if steps == 7:
+                    game_data.update({"DNF": game_data["DNF"] + 1})
+                    success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+                    print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
+                    break
+                else:
+                    game_data.update({str(steps): game_data[str(steps)] + 1})
+                    success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+                    print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
+                    break    
+        else:
+            game_data.update({"DNF": game_data["DNF"] + 1})
+            success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+            print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
+
+# test_MultiThreadedHRBFR2(100)
+
+def getMaxDeepSearch(available_words):
+    if available_words == gameFilter("salet", "00000", permanent_answers):  #hard-coded second guesses based on testing
+        guess = "muddy"
+    elif available_words == gameFilter("salet", "10000", permanent_answers):
+        guess = "hussy"
+    elif available_words == gameFilter("salet", "01000", permanent_answers):
+        guess = "croak"
+    elif available_words == gameFilter("salet", "00100", permanent_answers):
+        guess = "grill"
+    elif available_words == gameFilter("salet", "00010", permanent_answers):
+        guess = "pique"
+    elif available_words == gameFilter("salet", "00001", permanent_answers):
+        guess = "booth"
+    else:
+        guess = runMultithreadedHRBFR2(available_words, len(available_words))
+    return guess
 
 def validState(wordState):  #returns whether or not a word state is valid
     if len(wordState) != 5:
@@ -469,11 +517,23 @@ def test_highestFrequency(n):   #tests search using letter frequencies
             # print(steps, available_words)
             if test_word not in available_words:
                 raise RuntimeError("Answer not in list")
-            if len(available_words) == 1 and available_words[0] == test_word:
+            if len(available_words) == 1 and guessWord == test_word:
                 game_data.update({str(steps): game_data[str(steps)] + 1})
                 success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
                 print("highest_freq", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
-                break     
+                break 
+            elif len(available_words) == 1 and available_words[0] == test_word:
+                steps += 1
+                if steps == 7:
+                    game_data.update({"DNF": game_data["DNF"] + 1})
+                    success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+                    print("highest_freq", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
+                    break
+                else:
+                    game_data.update({str(steps): game_data[str(steps)] + 1})
+                    success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
+                    print("highest_freq", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
+                    break       
         else:
             game_data.update({"DNF": game_data["DNF"] + 1})
             success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
