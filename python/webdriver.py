@@ -39,10 +39,13 @@ keyboardIn("salet")
 wordList = gameEngine.gameFilter("salet", getWordState(0), wordList)
 for i in range(5):
     time.sleep(2)
+    # inputWord = gameEngine.runMultithreadedHRBFR2(wordList, 100)
     if gameEngine.isBlimp(wordList):
         inputWord = gameEngine.blimpSearch(wordList)
     else:
         inputWord = gameEngine.getMaxValue1(wordList)
     keyboardIn(inputWord)
     wordList = gameEngine.gameFilter(inputWord, getWordState(i + 1), wordList)
-time.sleep(10)
+while(1):
+    1
+# time.sleep(10)

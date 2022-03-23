@@ -127,8 +127,7 @@ def isBlimp(wordList):   #returns whether or not a word list has the "blimp prob
         for word2 in wordList:
             if word2 == word1:
                 continue
-            length = len(list(set(word1) & set(word2)))
-            if length >= 3 and length != 5: # if words have at least 3 letters in common
+            if len(list(set(word1) & set(word2))) >= 3: # if words have at least 3 letters in common
                 commonLetters = ""
                 for letters in list(set(word1) & set(word2)):
                     commonLetters += letters
@@ -147,15 +146,14 @@ def getBlimpMax(wordList, commonLetters, totalWords=wordsAllowed): #returns high
     return max(wordValues, key=wordValues.get)
 
 def blimpSearch(wordList):  #made to avoid the "blimp problem" where a search would be narrowed down best by a word already filtered out
-    threshold = math.floor(len(wordList)/2) # ex: match, batch, latch, patch are possible answers, blimp would be a good filter word
+    threshold = math.floor(len(wordList)/2) # ex: match, batch, latch are possible answers, blimp would be a good filter word
     commonLettersDict = {}
     blimpWords = {}
     for word1 in wordList:
         for word2 in wordList:
             if word2 == word1:
                 continue
-            length = len(list(set(word1) & set(word2)))
-            if length >= 3 and length != 5: # if words have at least 3 letters in common
+            if len(list(set(word1) & set(word2))) >= 3: # if words have at least 3 letters in common
                 commonLetters = ""
                 for letters in list(set(word1) & set(word2)):
                     commonLetters += letters
@@ -234,16 +232,16 @@ def get_word_value2(word, reset_list):   #goes through all the combinations of l
                         # print("Testing word state", first_letter * 81 + second_letter * 27 + third_letter * 9 + fourth_letter * 3 + fifth_letter * 1)
                         # print(word, wordState, word_list)
                         if len(word_list) > 0:
-                            resulting_words_list_lengths.append(len(word_list) * get_word_weighting(word, word_list, reset_list))
+                            resulting_words_list_lengths.append(0 - (len(reset_list) - len(word_list)) * get_list_matches(word, word_list, reset_list)) # made this negative so I didn't have to rewrite code
                         # print(resulting_words_list_lengths)
                         word_list = reset_list
     # print(word, weighted_value, resulting_words_list_lengths)
     if len(resulting_words_list_lengths) > 0:
-        return sum(resulting_words_list_lengths)    #returns sum of weighted averages
+        return sum(resulting_words_list_lengths) / len(reset_list)    #returns sum of weighted averages
     else:
-        return -1   #returns -1 if there are no resulting word lists (all states are impossible to reach)
+        return 1   #returns -1 if there are no resulting word lists (all states are impossible to reach)
 
-def get_word_weighting(input_word, focused_list, main_list):    #iterates through the main list and returns the percent of filtered lists from the main list that match the focused list
+def get_list_matches(input_word, focused_list, main_list):    #iterates through the main list and returns the number of filtered lists from the main list that match the focused list
     reset_list = [word for word in main_list]
     matches = 0
     for word in main_list:
@@ -253,7 +251,7 @@ def get_word_weighting(input_word, focused_list, main_list):    #iterates throug
             # print("Matches found:", matches)
         main_list = reset_list
     # print(matches / len(main_list))
-    return matches / len(main_list)
+    return matches
 
 def get_best_next_multithread(word_pool, totalWordList):    #multithreading-compatible method to get candidates for the best next word by weighted highest reduction average
     global min_word_dict
@@ -263,7 +261,7 @@ def get_best_next_multithread(word_pool, totalWordList):    #multithreading-comp
         word = word_pool[0]
         # print("Testing word: " + word + "\n")
         word_value = get_word_value2(word, totalWordList)
-        if word_value != -1 and word_value < min_word_dict[min(min_word_dict, key=min_word_dict.get)]:
+        if word_value != 1 and word_value < min_word_dict[min(min_word_dict, key=min_word_dict.get)]:
             minimum = word_value
             min_word = word
         word_pool.remove(word)
@@ -305,14 +303,16 @@ def runMultithreadedHRBFR2(wordList, numberOfThreads):   #gets the next best wor
         thread.start()
     for thread in threads:
         thread.join()
-    print(min_word_dict)
-    if len(min_word_dict) > 1:  # tie breaker for all the local minimum words
+    if len(min_word_dict) > 1:  # returns the word with the lowest score out of all the local minimums
+        print(min_word_dict)
         best_word_list = []
         min_value = min_word_dict[min(min_word_dict, key=min_word_dict.get)]
+        # print(min_value)
         for word in min_word_dict.keys():
             if min_word_dict[word] == min_value:        
                 best_word_list.append(word)
         best_word = getMaxValue1(best_word_list)
+        # print(best_word, best_word_list)
     else:
         best_word = min(min_word_dict, key=min_word_dict.get)
     return best_word
@@ -322,10 +322,10 @@ def test_MultiThreadedHRBFR2(n):    #tests deep search by highest weighted avera
     for i in range(n):
         available_words = [i[:-1] for i in open("words.txt", "r").readlines()]
         test_word = random.choice(available_words)
-        # print(test_word)
+        print(test_word)
         steps = 1
         if test_word == "salet":
-            # print(steps, available_words)
+            print(steps, available_words)
             game_data.update({str(steps): game_data[str(steps)] + 1})
             success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
             print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
@@ -341,7 +341,7 @@ def test_MultiThreadedHRBFR2(n):    #tests deep search by highest weighted avera
             print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
             continue
         for j in range(5):
-            available_words = filter_words(available_words, runMultithreadedHRBFR2(available_words, 60), test_word)
+            available_words = filter_words(available_words, runMultithreadedHRBFR2(available_words, 100), test_word)
             steps += 1
             # print(steps, available_words)
             if test_word not in available_words:
@@ -356,7 +356,7 @@ def test_MultiThreadedHRBFR2(n):    #tests deep search by highest weighted avera
             success_rate = 1 - (game_data["DNF"] / (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]))
             print("MT_HRBFR2", (game_data["1"] + game_data["2"] + game_data["3"] + game_data["4"] + game_data["5"] + game_data["6"] + game_data["DNF"]), game_data, success_rate, game_data_avg(game_data))
 
-# test_MultiThreadedHRBFR2(1000)
+# test_MultiThreadedHRBFR2(1)
 
 def gameFilter(word, wordState, word_list):   #filters words using game output information
     first_letter = int(wordState[0])
