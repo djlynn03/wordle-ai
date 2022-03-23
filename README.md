@@ -1,5 +1,5 @@
 # wordle-ai
-This AI currently has an accuracy of approximately 99.9% and an average steps-per-game of 2.86 using the answer list (2315 words)-
+This AI currently has an accuracy of approximately 99.7% and an average steps-per-game of 3.66 using the answer list (2315 words)-
 <br>
 ![Accuracy](acc2.JPG)
 <br>
